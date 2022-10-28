@@ -1,6 +1,6 @@
 install.packages("rmarkdown")
 install.packages("devtools")
- tinytex::install_tinytex()
+tinytex::install_tinytex()
 
 #1Create a vector using : operator
   #1.a	Sequence from -5 to 5
