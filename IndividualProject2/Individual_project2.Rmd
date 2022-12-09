@@ -1,0 +1,170 @@
+---
+title: "individual_project2"
+output: html_document
+date: "2022-12-09"
+---
+
+```{r, include=TRUE}
+
+
+library(RColorBrewer)
+library(tm)
+library(dplyr)
+library(wordcloud)
+library(ggplot2)
+library(twitteR)
+library(plotly)
+```
+# SETUP CREDENTIALS.
+```{r, include=TRUE}
+
+
+API_KEY <- "AVkKX52SdvJHVkL8FKkiWx1Zl"
+API_SECRET_KEY <- "rX4kXD8LJbeNa8p19MCQvEIjhNXLa5gyBBeAhorC3C2dCpgh1Y"
+ACCESS_TOKEN <-  "1595206858142121986-NZNHhytlvCoFo7eAFlNomofNthZLFk"
+ACCESS_SECRET <-  "K7qSpHI15utrwDkoI3OwOHHg6IlwKT5RO0QQXwgvhcdIu"
+```
+
+```{r, include=TRUE}
+
+
+setup_twitter_oauth(consumer_key = API_KEY,
+                    consumer_secret = API_SECRET_KEY,
+                    access_token = ACCESS_TOKEN,
+                    access_secret = ACCESS_SECRET)
+```
+# EXTRACTING TWEETS.
+```{r, include=TRUE}
+
+
+Trendtweets <- searchTwitter("1D", n=10000, lang="en", since="2022-12-1",
+                              until="2022-12-7", retryOnRateLimit = 120)
+Trendtweets
+```
+# CONVERTING LIST DATA TO DATA FRAME.
+
+```{r, include=TRUE}
+
+
+trendtweetsdf <- twListToDF(Trendtweets)
+```
+# SAVE DATA FRAME FILE.
+```{r, include=TRUE}
+
+
+save(trendtweetsdf,file = "trendtweetsdf.Rdata")
+```
+# LOAD DATA FRAME FILE.
+```{r, include=TRUE}
+
+
+load(file = "trendtweetsdf.Rdata")
+```
+# CHECKING FOR MISSING VALUES IN A DATA FRAME.
+```{r, include=TRUE}
+
+
+sap_ply <- sapply(trendtweetsdf, function(x) sum(is.na(x)))
+
+sap_ply
+
+```
+#TWEETS
+
+  # SUBSETTING USING THE dplyr() PACKAGE.
+```{r, include=TRUE}
+
+
+tweets <- trendtweetsdf %>%
+  select(screenName,text,created, isRetweet) %>% filter(isRetweet == FALSE)
+tweets
+```
+  # GROUPING THE DATA CREATED. 
+```{r, include=TRUE}
+
+
+tweets %>%  
+  group_by(1) %>%  
+  summarise(max = max(created), min = min(created))
+```
+```{r, include=TRUE}
+
+
+crt1 <- tweets %>%  mutate(Created_At_Round = 
+        created %>% round(units = 'hours') %>% as.POSIXct())
+crt1
+```
+```{r, include=TRUE}
+
+
+minimum <- tweets %>% pull(created) %>% min()
+
+minimum 
+```
+```{r, include=TRUE}
+
+
+maximum <- tweets %>% pull(created) %>% max()
+
+maximum
+```
+  # Plot on tweets by time using the library(plotly) and ggplot().
+```{r, include=TRUE}
+
+
+ploty <- ggplot(crt1, aes(x = Created_At_Round)) +
+  geom_histogram(aes(fill = ..count..)) +
+  theme(legend.position = "right") +
+  xlab("Time") + ylab("Number of tweets") + 
+  scale_fill_gradient(low = "midnightblue", high = "aquamarine4")
+
+ploty %>% ggplotly()
+```
+#RETWEETS
+```{r, include=TRUE}
+
+retweetss <- trendtweetsdf %>%
+  select(screenName,text,created, isRetweet) %>% filter(isRetweet == TRUE)
+retweetss
+
+```
+```{r, include=TRUE}
+
+
+retweetss %>%  
+  group_by(1) %>%  
+  summarise(max = max(created), min = min(created))
+```
+```{r, include=TRUE}
+
+
+crt2 <- retweetss %>%  mutate(Created_At_Round = 
+      created %>% round(units = 'hours') %>% as.POSIXct())
+crt2
+```
+```{r, include=TRUE}
+
+
+minimum <- retweetss %>% pull(created) %>% min()
+
+minimum 
+```
+```{r, include=TRUE}
+
+
+maximum <- retweetss %>% pull(created) %>% max()
+
+maximum
+```
+  # Plot on tweets by time using the library(plotly) and ggplot().
+```{r, include=TRUE}
+
+
+ploty <- ggplot(crt2, aes(x = Created_At_Round)) +
+  geom_histogram(aes(fill = ..count..)) +
+  theme(legend.position = "right") +
+  xlab("Time") + ylab("Number of tweets") + 
+  scale_fill_gradient(low = "midnightblue", high = "aquamarine4")
+
+ploty %>% ggplotly()
+```
