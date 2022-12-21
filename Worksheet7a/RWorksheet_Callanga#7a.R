@@ -122,8 +122,7 @@ ord
 #b. Import the data from MS Excel. Copy the codes.
 
 library("readxl")
-  data <- read_excel("D:/CS101_BSIT1A/CALLANGA_NEWREPO/Worksheet7a/
-                     Breast_Cancer.xlsx")
+  data <- read_excel("Breast_Cancer.xlsx")
   
   data
 
@@ -223,6 +222,5 @@ library("AppliedPredictiveModeling")
   install.packages("xlsxjars")
 
   library(xlsx)
-  write.xlsx("abalone", "D:/CS101_BSIT1A/CALLANGA_NEWREPO/Worksheet7a/
-             abalone.xlsx")
+  write.xlsx( "abalone", "abalone.xlsx")
 
